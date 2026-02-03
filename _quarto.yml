@@ -6,13 +6,8 @@ website:
   title: "Oregon Health"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
       - href: "oregon-health.qmd"
         text: Oregon Health Analysis
-      - href: about.qmd
-        text: About
-
 format:
   html:
     theme:
