@@ -1,13 +1,17 @@
 project:
   type: website
+  output-dir: docs
 
 website:
-  title: "mandy180.github.io"
+  title: "Oregon Health"
   navbar:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - href: Oregon Health.qmd
+        text: Oregon Health Analysis
+      - href: about.qmd
+        text: About
 
 format:
   html:
