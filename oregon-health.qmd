@@ -1,0 +1,202 @@
+---
+title: "Oregon Health by Counties"
+format: html
+execute:
+  echo: false
+  warning: false
+  message: false
+execute-dir: project
+editor: visual
+---
+
+## Introduction
+
+The health of an individual is not formed by just their choices but rather by the social, economic, and environmental conditions of their community. Counties with limited access to nutritious food, healthcare, education, and stable income are often faced with worst health outcomes than those with more resources. By understanding which structural factors are strongly associated with poor health, lawmakers can make better informed decisions on public health policy. This study will focus on the health outcomes and health predictors gathered by the County Health Rankings program released in 2025. It includes factors such as days of poor physical health days, days of poor mental health days, unemployment rate, air pollution index, obesity rate,. and many more. Together, these measures provide a whole comprehensive view of how these factors influence population health at a county level. By evaluating multiple health outcomes instead of a single one in isolation, this analysis strives to identify consistent patterns and trends. In particular, is there one dominant driver of poor health across Oregon counties? Especially when public health resources and funding are limited, being able to identify the predictors with the most influence will prioritize interventions that will result in the greatest impact.
+
+#### Research Question
+
+Which of the socioeconomic, environmental, and access to care factors can give us the strongest prediction of poor health (mentally and physically) and contribute to premature death across Oregon counties in 2025?
+
+## Initial Analysis
+
+This study uses county level health data for all Oregon counties from the 2025 release of the County Health Rankings & Roadmaps program started by University of Wisconsin School Population Health Institute. The dataset are collected from over 20 national data sources such as National Center for Health Statistics, the American Community Survey, and etc. To be noted, the data gathered is based on the years each research was being conducted thus some data points are from at least 2018. Certain variable such as poor physical and mental health days are self-reported. The data has been reduced from 30 combined health predictors and health outcomes to 4 outcomes and 14 predictors. Missing values will be handled by using omit() which removes the entire row and extreme outliers will be screened. Collinearity was addressed using Variance Inflation Factors (VIF), and transformations (including Lasso) were applied when necessary to satisfy assumptions. Because the dataset is collected at the county level, all analyses reflect associations rather than causation.
+
+Health Outcomes: premature death, life expectancy, poor physical health, poor mental health, suicides, and obesity.
+
+Health Predictors: excessive drinking, obesity, some college, and exercise opportunity are behavioral predictors. Clinical access predictors includes primary care physicians and mental health providers. Social determinant predictors include income inequality, unemployment, children poverty, severe housing problems, school funding. Community wellness access includes air pollution, library access, gym access, and food environment.
+
+##### \*Data Dictionary is available for viewing and attached
+
+#### Data Exploration
+
+```{r}
+#install.packages("corrplot")
+library(corrplot)
+df = read.csv("data/Oregon_Health_Data_Cleaned.csv", header = TRUE)
+num_df = df[, sapply(df, is.numeric)]
+corr_mat = cor(num_df, use = "complete.obs")
+
+corrplot(
+  corr_mat,
+  method = "color",
+  tl.cex = 0.5,    #
+  number.cex = 0.5, # 
+  mar = c(0, 0, 2, 0) # 
+)
+
+title("Correlation Matrix of County Health Factors", line = 3)
+
+```
+
+Initial analysis sfrom the correlation heatmap revealed strong relationship among socioeconomic hardship variables, particularly childhood poverty and unemployment. Environmental conditions such as exercise opportunity, access to healthy food index, and obesity have a lot more correlation to other factors. Additionally, poor physical and poor mental health days displayed a strong positive correlation, suggesting a close relationship between physical and psychological well-being.
+
+```{r}
+pairs(df[, c("Premature.Death","Life.Expectancy","Poor.Physical","Poor.Mental","Obesity")])
+```
+
+```{r}
+health_vars = df[, c("Premature.Death",
+                      "Life.Expectancy",
+                      "Poor.Physical",
+                      "Poor.Mental",
+                      "Obesity")]
+cor(health_vars, use = "complete.obs")
+```
+
+Further analysis of the five health predictors show multicollinearity can occur if two or more are used to build a regression model. This is very apparent for the premature death and life expectancy predictors where both are shown to have a correlation coefficient of -0.9590672 which is close to a perfect negative correlation of -1. This translates perfectly in the real world where with higher premature deaths will lead to lower life expectancy. The correlation between poor physical health and poor mental health is also shown to be relatively strong at 0.7313594 as seen previously from the correlation matrix. Poor physical health is also strongly correlated to life expectancy as well. Based on our findings, we need to make sure to omit the highly correlated predictors to the response variable when we are building our model to prevent unreliable coefficients.
+
+## Model 1: Predicting Poor Mental Health Days
+
+Poor Mental Health Days =β0​+β1​(Obesity)+β2​(MentalProviders)+β3​( Housing Problems)+ β4(Unemployment) + β5(Children.Poverty)
+
+This model examines predictors of poor mental health days, defined as the average number of mentally unhealthy days reported in the past 30 days. This outcome captures the burden of health problems such as obesity along with the lack of access to mental health professionals will contribute to a person's mental health. The basic needs of housing and steady income along with childhood poverty are also crucial to predicting our model.
+
+An initial multiple linear regression model was fit using all available predictors, excluding poor physical health days due to its strong correlation with poor mental health days. Variance Inflation Factors (VIFs) was then computed to assess multicollinearity among predictors. Variables with VIF values exceeding 5 were considered problematic and removed. These removals helped stabilize coefficient estimates and reduce redundancy among predictors. Following multicollinearity reduction, stepwise model selection using Akaike Information Criterion (stepAIC) was applied to further reduce any excessive number of predictors for simplicity.
+
+The model produces an R squared of 0.5401 and the F-statistic of 6.342 with a p-value of 0.00005148. This means our model has at least one predictor that is related to the outcome. However, the model can only capture 45% of the variation in the poor mental health days using the selected predictors. The residuals have a median of -0.006 which is good because it is close to 0. The obesity coefficient with the p value of 0.0226 and standard error of 0.0130 tell us that it is the most statistically significant factor for when the rest of variables are constant a one unit increase in obesity equates to 0.0314123 day(s) of poor mental health. The mental providers is proved to be significant as well because of the p value of 0.0420 where for each unit increase in mental health providers and other variables are hold at a constant then there is a decrease of 0.0010711 in poor mental health days. It also holds a standard error of 0.0005017 demonstrating a more precise estimate. The rest of the coefficients hold a p-value of more than 0.1059 which means they do not have statistical significance.
+
+```{r, echo = FALSE}
+df = read.csv("data/Oregon_Health_Data_Cleaned.csv", header = TRUE )
+df = df[, -c(1, 2)] # getting rid of State and County columns
+df = na.omit(df)
+mod1 = lm(Poor.Mental ~ . -Poor.Physical, data=df) # initial model 
+#summary(mod1)
+
+library(car)
+#vif(mod1) # values over 5 should be ommitted
+
+
+mod1 = lm(Poor.Mental ~ . -Poor.Physical -Premature.Death -Life.Expectancy -Suicides -Food.Index, data=df) # initial model 
+library(MASS)
+
+library(effects)
+mod_step = stepAIC(mod1, direction="both", trace = FALSE)
+#summary(mod_step)
+
+plot(mod_step)
+
+```
+
+The graph shows to have linearity, heteroskedascity, normality.
+
+## 3.2 Model 2: Predicting Poor Physical Health Days
+
+Poor Physical Health Days =β0​+β1​(Premature Death)+β2​(Obesity)+β3​(Exercise Opportunity)+ β4​(Food Index)+β5​(Mental Providers)+β6​(Library Access)+β37(Unemployment)+β8​(Children Poverty)+β9​(Suicides)
+
+```{r}
+mod_phys_full = lm(Poor.Physical ~ . -Poor.Mental -Life.Expectancy, data = df)
+vif(mod_phys_full)
+mod_phys_step = stepAIC(mod_phys_full, direction = "both", trace = FALSE)
+
+coefs = summary(mod_phys_step)$coefficients
+round(coefs, 5)
+
+```
+
+The second model examines county-level predictors of Poor Physical Health Days, defined as the average number of physically unhealthy days reported in the past 30 days. This outcome captures how a variety of factors can affect people across Oregon counties. This is a stark contrast from our first model predicting poor mental health days where we were able to eliminate a lot of coefficients due to high correlation. This might be due to the way predictors affect physical health in very different ways and less overlapping than mental health. A real life explanation for this is how mental health is shaped mainly by access to mental health care and poverty. Whereas, for physical health is more likely to be influenced by multiple factors and more complex.
+
+An initial multiple linear regression model was fit using all available predictors, excluding poor mental health days and life expectancy to avoid multicollinearity due to the strong correlation between of these two factors. Variance Inflation Factors (VIFs) were then examined to assess multicollinearity. All VIF values were below 5, suggesting that multicollinearity was not a concern and that coefficient estimates were stable. Stepwise model selection was then applied to reduce from 14 to 9 predictors. The stepAIC procedure retained all nine predictors listed above, indicating that each variable contributed meaningfully to model fit. These are the same exact to how poor mental health was conducted.
+
+The model has the F-statistic value of 18.73 with a p-value of less than 0.001 proving that the variance did not happen by chance and that at least one of the predictors matter. The R squared for this model is 0.8799 which means it captured approximately 88% of the variability in poor physical health days across Oregon counties is explained by the predictors in the model. Premature Death is shown to have a coefficient of 0.00006 and a p value of 0.0188 along with standard error of 0.00002. This proves this predictor is statistically significant in predicting poor physical health days. This makes sense as the more physical health problems and poor physical functioning can contribute to illnesses that are deathly. Access to healthy food, mental health providers, exercise opportunities also prove to be important.
+
+```{r}
+plot(mod_phys_step$fitted.values, mod_phys_step$residuals)
+abline(h = 0, col = 3, lwd = 4)
+```
+
+Residuals were approximately normally distributed. No curves or trend visual so linearity is observed
+
+```{r}
+group1 = mod_phys_step$fitted > median(mod_phys_step$fitted)
+var.test(mod_phys_step$residuals[group1], mod_phys_step$residuals[!group1])
+```
+
+With p-value of 0.1437 null hypothesis cannot be rejected thus heteroscedasticity is observed.
+
+```{r}
+shapiro.test(mod_phys_step$residuals)
+```
+
+With a p-value of 0.7003, null hypothesis cannot be rejected thus normality is observed. Our data is collected randomly and one data point does not affect another data point so independence is observed.
+
+## 3.3 Model 3: Predicting Pre-Mature Death
+
+Premature Death =β0​+β1​(Poor Physical)+β2​(Children Poverty)+β3​(Suicides)
+
+```{r}
+
+library(glmnet)
+y = df$Premature.Death
+X = model.matrix(Premature.Death ~ . -Life.Expectancy, data = df)[, -1]  # remove intercept
+set.seed(123)
+lasso_cv = cv.glmnet(X, y, alpha = 1)
+lasso_cv$lambda.min      # best model
+lasso_cv$lambda.1se      # simple model
+#coef(lasso_cv, s = "lambda.min")
+lasso_model = glmnet(X, y, alpha = 1, lambda = lasso_cv$lambda.min)
+coef(lasso_model)
+
+```
+
+The third model focuses on predicting Premature Death, measured as years of potential life lost before age 75 per 100,000 population. Unlike the previous models, which used traditional linear regression, this analysis employs a LASSO (Least Absolute Shrinkage and Selection Operator) regression approach to handle the larger set of potentially correlated predictors and to identify the most influential variables driving premature mortality.
+
+Premature death is influenced by a complex reasons of physical health, mental health, behavioral risks, and socioeconomic conditions. Because many of these predictors are correlated, a standard multiple regression model could suffer from multicollinearity. LASSO regression addresses these challenges by shrinking less important coefficients toward zero and performing automatic variable selection. Life expectancy was omitted direct overlap with premature death. Ten-fold cross-validation was conducted using cv.glmet() to determine the optimal value of the parameter.
+
+```{r}
+plot(lasso_cv)
+```
+
+At the selected penalty level (λmin\_{min}min​), the LASSO model retained only **three predictors** with non-zero coefficients:
+
+| Predictor                 | Coefficient |
+|---------------------------|-------------|
+| Poor Physical Health Days | 133.70      |
+| Children in Poverty       | 185.16      |
+| Suicides                  | 25.51       |
+
+All other predictors were shrunk to zero, indicating that they did not provide additional predictive value once these core variables were accounted for. Since Lasso was used for model selection, our final model is shown below using least squares regression as the other two models.
+
+```{r}
+mod_final = lm( Premature.Death ~ Poor.Physical + Children.Poverty + Suicides, data = df)
+summary(mod_final)
+```
+
+```{r}
+confint(mod_final)
+
+```
+
+Among the predictors retained from the LASSO model, only child poverty exhibits a statistically significant association with premature death based on 95% confidence intervals as the confidence interval lies above zero. The results highlight three dominant driver child poverty emerged as the strongest predictor in the model. This suggests that early-life socioeconomic disadvantage has profound and long-lasting impacts on population health and life expectancy. The exclusion of other predictorssuch as obesity, healthcare access, and environmental factors does not imply that they are unimportant. Rather, their effects are likely mediated through or correlated with the retained variables, particularly physical health burden and socioeconomic disadvantage.
+
+## Conclusion
+
+```{r}
+
+newdata = data.frame( Poor.Physical = mean(df$Poor.Physical), Children.Poverty  = 13, Suicides = mean(df$Suicides))
+predict(mod_final, newdata, interval = "prediction")
+
+```
+
+For a county with average levels of poor physical health and suicide rates along with 13% of children living in poverty it is predicted to have approximately 7691.385 years of potential life list with a 95% prediction interval ranging from 4651.213 to 10731.56. When we compare this to the Multnomah county where they also share 13% percentage of children living in poverty and the premature death years is 7691.385 which is consistent with our model's prediction.
+
+Among the three models, the theme of childhood poverty has come up consistently as the strongest predictor of health outcome. This important information should not be overlooked when it comes to ways we can pour into the communities to promote individual health. In our first model of predicting poor mental health , childhood poverty is retained despite other variables being eliminated. This suggests this variable captures a broader and consistent effects on mental health. In the model used to predict poor physical health days, childhood poverty is again retained along with broader set of variables. This indicates that physical health is influenced by a lot of factors yet childhood poverty still retain its importance rather than disappearing and merging with the rest. Finally, it is the only statistically significant predictor in the third model predicting premature death years after using LASSO and least-squares regression. The estimated effect includes for every 1% of children living in poverty and poor physical health and suicides controlled, the number of premature death years increase by 196.30. With all that said, these results demonstrate how important it is for lawmakers to look into ways to prevent and reduce the percentage of kids currently living in poverty. This can be explained as the long-term exposure to a lot of other health predictors such as lack of access to healthy food, limited access to gym and health care providers can have a huge negative impact on the general well-being of people which becomes a generational cycle.

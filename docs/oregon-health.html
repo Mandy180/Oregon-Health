@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Oregon Health by Counties – Oregon Health</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-6bd9cfa162949bde0a231f530c97869d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Oregon Health</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./oregon-health.html" aria-current="page"> 
+<span class="menu-text">Oregon Health Analysis</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#initial-analysis" id="toc-initial-analysis" class="nav-link" data-scroll-target="#initial-analysis">Initial Analysis</a></li>
+  <li><a href="#model-1-predicting-poor-mental-health-days" id="toc-model-1-predicting-poor-mental-health-days" class="nav-link" data-scroll-target="#model-1-predicting-poor-mental-health-days">Model 1: Predicting Poor Mental Health Days</a></li>
+  <li><a href="#model-2-predicting-poor-physical-health-days" id="toc-model-2-predicting-poor-physical-health-days" class="nav-link" data-scroll-target="#model-2-predicting-poor-physical-health-days">3.2 Model 2: Predicting Poor Physical Health Days</a></li>
+  <li><a href="#model-3-predicting-pre-mature-death" id="toc-model-3-predicting-pre-mature-death" class="nav-link" data-scroll-target="#model-3-predicting-pre-mature-death">3.3 Model 3: Predicting Pre-Mature Death</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Oregon Health by Counties</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>The health of an individual is not formed by just their choices but rather by the social, economic, and environmental conditions of their community. Counties with limited access to nutritious food, healthcare, education, and stable income are often faced with worst health outcomes than those with more resources. By understanding which structural factors are strongly associated with poor health, lawmakers can make better informed decisions on public health policy. This study will focus on the health outcomes and health predictors gathered by the County Health Rankings program released in 2025. It includes factors such as days of poor physical health days, days of poor mental health days, unemployment rate, air pollution index, obesity rate,. and many more. Together, these measures provide a whole comprehensive view of how these factors influence population health at a county level. By evaluating multiple health outcomes instead of a single one in isolation, this analysis strives to identify consistent patterns and trends. In particular, is there one dominant driver of poor health across Oregon counties? Especially when public health resources and funding are limited, being able to identify the predictors with the most influence will prioritize interventions that will result in the greatest impact.</p>
+<section id="research-question" class="level4">
+<h4 class="anchored" data-anchor-id="research-question">Research Question</h4>
+<p>Which of the socioeconomic, environmental, and access to care factors can give us the strongest prediction of poor health (mentally and physically) and contribute to premature death across Oregon counties in 2025?</p>
+</section>
+</section>
+<section id="initial-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="initial-analysis">Initial Analysis</h2>
+<p>This study uses county level health data for all Oregon counties from the 2025 release of the County Health Rankings &amp; Roadmaps program started by University of Wisconsin School Population Health Institute. The dataset are collected from over 20 national data sources such as National Center for Health Statistics, the American Community Survey, and etc. To be noted, the data gathered is based on the years each research was being conducted thus some data points are from at least 2018. Certain variable such as poor physical and mental health days are self-reported. The data has been reduced from 30 combined health predictors and health outcomes to 4 outcomes and 14 predictors. Missing values will be handled by using omit() which removes the entire row and extreme outliers will be screened. Collinearity was addressed using Variance Inflation Factors (VIF), and transformations (including Lasso) were applied when necessary to satisfy assumptions. Because the dataset is collected at the county level, all analyses reflect associations rather than causation.</p>
+<p>Health Outcomes: premature death, life expectancy, poor physical health, poor mental health, suicides, and obesity.</p>
+<p>Health Predictors: excessive drinking, obesity, some college, and exercise opportunity are behavioral predictors. Clinical access predictors includes primary care physicians and mental health providers. Social determinant predictors include income inequality, unemployment, children poverty, severe housing problems, school funding. Community wellness access includes air pollution, library access, gym access, and food environment.</p>
+<section id="data-dictionary-is-available-for-viewing-and-attached" class="level5">
+<h5 class="anchored" data-anchor-id="data-dictionary-is-available-for-viewing-and-attached">*Data Dictionary is available for viewing and attached</h5>
+</section>
+<section id="data-exploration" class="level4">
+<h4 class="anchored" data-anchor-id="data-exploration">Data Exploration</h4>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="oregon-health_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Initial analysis sfrom the correlation heatmap revealed strong relationship among socioeconomic hardship variables, particularly childhood poverty and unemployment. Environmental conditions such as exercise opportunity, access to healthy food index, and obesity have a lot more correlation to other factors. Additionally, poor physical and poor mental health days displayed a strong positive correlation, suggesting a close relationship between physical and psychological well-being.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="oregon-health_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>                Premature.Death Life.Expectancy Poor.Physical Poor.Mental
+Premature.Death       1.0000000      -0.9590672     0.5943143   0.4591425
+Life.Expectancy      -0.9590672       1.0000000    -0.7012812  -0.5646876
+Poor.Physical         0.5943143      -0.7012812     1.0000000   0.7313594
+Poor.Mental           0.4591425      -0.5646876     0.7313594   1.0000000
+Obesity               0.4207251      -0.5595049     0.7181524   0.4924292
+                   Obesity
+Premature.Death  0.4207251
+Life.Expectancy -0.5595049
+Poor.Physical    0.7181524
+Poor.Mental      0.4924292
+Obesity          1.0000000</code></pre>
+</div>
+</div>
+<p>Further analysis of the five health predictors show multicollinearity can occur if two or more are used to build a regression model. This is very apparent for the premature death and life expectancy predictors where both are shown to have a correlation coefficient of -0.9590672 which is close to a perfect negative correlation of -1. This translates perfectly in the real world where with higher premature deaths will lead to lower life expectancy. The correlation between poor physical health and poor mental health is also shown to be relatively strong at 0.7313594 as seen previously from the correlation matrix. Poor physical health is also strongly correlated to life expectancy as well. Based on our findings, we need to make sure to omit the highly correlated predictors to the response variable when we are building our model to prevent unreliable coefficients.</p>
+</section>
+</section>
+<section id="model-1-predicting-poor-mental-health-days" class="level2">
+<h2 class="anchored" data-anchor-id="model-1-predicting-poor-mental-health-days">Model 1: Predicting Poor Mental Health Days</h2>
+<p>Poor Mental Health Days =β0​+β1​(Obesity)+β2​(MentalProviders)+β3​( Housing Problems)+ β4(Unemployment) + β5(Children.Poverty)</p>
+<p>This model examines predictors of poor mental health days, defined as the average number of mentally unhealthy days reported in the past 30 days. This outcome captures the burden of health problems such as obesity along with the lack of access to mental health professionals will contribute to a person’s mental health. The basic needs of housing and steady income along with childhood poverty are also crucial to predicting our model.</p>
+<p>An initial multiple linear regression model was fit using all available predictors, excluding poor physical health days due to its strong correlation with poor mental health days. Variance Inflation Factors (VIFs) was then computed to assess multicollinearity among predictors. Variables with VIF values exceeding 5 were considered problematic and removed. These removals helped stabilize coefficient estimates and reduce redundancy among predictors. Following multicollinearity reduction, stepwise model selection using Akaike Information Criterion (stepAIC) was applied to further reduce any excessive number of predictors for simplicity.</p>
+<p>The model produces an R squared of 0.5401 and the F-statistic of 6.342 with a p-value of 0.00005148. This means our model has at least one predictor that is related to the outcome. However, the model can only capture 45% of the variation in the poor mental health days using the selected predictors. The residuals have a median of -0.006 which is good because it is close to 0. The obesity coefficient with the p value of 0.0226 and standard error of 0.0130 tell us that it is the most statistically significant factor for when the rest of variables are constant a one unit increase in obesity equates to 0.0314123 day(s) of poor mental health. The mental providers is proved to be significant as well because of the p value of 0.0420 where for each unit increase in mental health providers and other variables are hold at a constant then there is a decrease of 0.0010711 in poor mental health days. It also holds a standard error of 0.0005017 demonstrating a more precise estimate. The rest of the coefficients hold a p-value of more than 0.1059 which means they do not have statistical significance.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="oregon-health_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="oregon-health_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="oregon-health_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="oregon-health_files/figure-html/unnamed-chunk-4-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The graph shows to have linearity, heteroskedascity, normality.</p>
+</section>
+<section id="model-2-predicting-poor-physical-health-days" class="level2">
+<h2 class="anchored" data-anchor-id="model-2-predicting-poor-physical-health-days">3.2 Model 2: Predicting Poor Physical Health Days</h2>
+<p>Poor Physical Health Days =β0​+β1​(Premature Death)+β2​(Obesity)+β3​(Exercise Opportunity)+ β4​(Food Index)+β5​(Mental Providers)+β6​(Library Access)+β37(Unemployment)+β8​(Children Poverty)+β9​(Suicides)</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>   Premature.Death            Obesity    Exercise.Opport         Food.Index 
+          6.972782           3.543307           5.453768          11.295091 
+Primary.Physicians   Mental.Providers   Housing.Problems      Air.Pollution 
+          3.050530           2.873577           3.615885           1.716481 
+    Library.Access       Some.College       Unemployment   Children.Poverty 
+          2.062333           1.775026           4.630494           6.009079 
+          Suicides Excessive.Drinking     School.Funding  Income.Inequality 
+         12.188297           2.280186           3.043083           3.349513 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 Estimate Std. Error  t value Pr(&gt;|t|)
+(Intercept)       4.90977    0.80907  6.06842  0.00000
+Premature.Death   0.00006    0.00002  2.52717  0.01883
+Obesity           0.03888    0.01111  3.49958  0.00193
+Exercise.Opport  -0.00516    0.00233 -2.21969  0.03658
+Food.Index       -0.14724    0.06573 -2.23995  0.03505
+Mental.Providers -0.00117    0.00042 -2.80582  0.01003
+Library.Access   -0.04093    0.02032 -2.01433  0.05581
+Unemployment     -0.13715    0.07047 -1.94616  0.06395
+Children.Poverty  0.02336    0.01218  1.91789  0.06762
+Suicides         -0.00887    0.00570 -1.55795  0.13290</code></pre>
+</div>
+</div>
+<p>The second model examines county-level predictors of Poor Physical Health Days, defined as the average number of physically unhealthy days reported in the past 30 days. This outcome captures how a variety of factors can affect people across Oregon counties. This is a stark contrast from our first model predicting poor mental health days where we were able to eliminate a lot of coefficients due to high correlation. This might be due to the way predictors affect physical health in very different ways and less overlapping than mental health. A real life explanation for this is how mental health is shaped mainly by access to mental health care and poverty. Whereas, for physical health is more likely to be influenced by multiple factors and more complex.</p>
+<p>An initial multiple linear regression model was fit using all available predictors, excluding poor mental health days and life expectancy to avoid multicollinearity due to the strong correlation between of these two factors. Variance Inflation Factors (VIFs) were then examined to assess multicollinearity. All VIF values were below 5, suggesting that multicollinearity was not a concern and that coefficient estimates were stable. Stepwise model selection was then applied to reduce from 14 to 9 predictors. The stepAIC procedure retained all nine predictors listed above, indicating that each variable contributed meaningfully to model fit. These are the same exact to how poor mental health was conducted.</p>
+<p>The model has the F-statistic value of 18.73 with a p-value of less than 0.001 proving that the variance did not happen by chance and that at least one of the predictors matter. The R squared for this model is 0.8799 which means it captured approximately 88% of the variability in poor physical health days across Oregon counties is explained by the predictors in the model. Premature Death is shown to have a coefficient of 0.00006 and a p value of 0.0188 along with standard error of 0.00002. This proves this predictor is statistically significant in predicting poor physical health days. This makes sense as the more physical health problems and poor physical functioning can contribute to illnesses that are deathly. Access to healthy food, mental health providers, exercise opportunities also prove to be important.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="oregon-health_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Residuals were approximately normally distributed. No curves or trend visual so linearity is observed</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    F test to compare two variances
+
+data:  mod_phys_step$residuals[group1] and mod_phys_step$residuals[!group1]
+F = 2.1342, num df = 15, denom df = 16, p-value = 0.1437
+alternative hypothesis: true ratio of variances is not equal to 1
+95 percent confidence interval:
+ 0.7656245 6.0526674
+sample estimates:
+ratio of variances 
+          2.134192 </code></pre>
+</div>
+</div>
+<p>With p-value of 0.1437 null hypothesis cannot be rejected thus heteroscedasticity is observed.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Shapiro-Wilk normality test
+
+data:  mod_phys_step$residuals
+W = 0.97724, p-value = 0.7003</code></pre>
+</div>
+</div>
+<p>With a p-value of 0.7003, null hypothesis cannot be rejected thus normality is observed. Our data is collected randomly and one data point does not affect another data point so independence is observed.</p>
+</section>
+<section id="model-3-predicting-pre-mature-death" class="level2">
+<h2 class="anchored" data-anchor-id="model-3-predicting-pre-mature-death">3.3 Model 3: Predicting Pre-Mature Death</h2>
+<p>Premature Death =β0​+β1​(Poor Physical)+β2​(Children Poverty)+β3​(Suicides)</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 487.9547</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1027.098</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>18 x 1 sparse Matrix of class "dgCMatrix"
+                          s0
+(Intercept)        4124.7226
+Poor.Physical       133.7012
+Poor.Mental           .     
+Obesity               .     
+Exercise.Opport       .     
+Food.Index            .     
+Primary.Physicians    .     
+Mental.Providers      .     
+Housing.Problems      .     
+Air.Pollution         .     
+Library.Access        .     
+Some.College          .     
+Unemployment          .     
+Children.Poverty    185.1603
+Suicides             25.5072
+Excessive.Drinking    .     
+School.Funding        .     
+Income.Inequality     .     </code></pre>
+</div>
+</div>
+<p>The third model focuses on predicting Premature Death, measured as years of potential life lost before age 75 per 100,000 population. Unlike the previous models, which used traditional linear regression, this analysis employs a LASSO (Least Absolute Shrinkage and Selection Operator) regression approach to handle the larger set of potentially correlated predictors and to identify the most influential variables driving premature mortality.</p>
+<p>Premature death is influenced by a complex reasons of physical health, mental health, behavioral risks, and socioeconomic conditions. Because many of these predictors are correlated, a standard multiple regression model could suffer from multicollinearity. LASSO regression addresses these challenges by shrinking less important coefficients toward zero and performing automatic variable selection. Life expectancy was omitted direct overlap with premature death. Ten-fold cross-validation was conducted using cv.glmet() to determine the optimal value of the parameter.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="oregon-health_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>At the selected penalty level (λmin_{min}min​), the LASSO model retained only <strong>three predictors</strong> with non-zero coefficients:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Predictor</th>
+<th>Coefficient</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Poor Physical Health Days</td>
+<td>133.70</td>
+</tr>
+<tr class="even">
+<td>Children in Poverty</td>
+<td>185.16</td>
+</tr>
+<tr class="odd">
+<td>Suicides</td>
+<td>25.51</td>
+</tr>
+</tbody>
+</table>
+<p>All other predictors were shrunk to zero, indicating that they did not provide additional predictive value once these core variables were accounted for. Since Lasso was used for model selection, our final model is shown below using least squares regression as the other two models.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Premature.Death ~ Poor.Physical + Children.Poverty + 
+    Suicides, data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4034.6  -681.8    63.3   664.5  2997.5 
+
+Coefficients:
+                 Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)      -1153.04    3599.44  -0.320   0.7510  
+Poor.Physical     1049.68     990.40   1.060   0.2980  
+Children.Poverty   196.30      89.37   2.196   0.0362 *
+Suicides            67.88      35.61   1.906   0.0666 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1423 on 29 degrees of freedom
+Multiple R-squared:  0.5826,    Adjusted R-squared:  0.5394 
+F-statistic: 13.49 on 3 and 29 DF,  p-value: 1.084e-05</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>                        2.5 %    97.5 %
+(Intercept)      -8514.724740 6208.6479
+Poor.Physical     -975.923455 3075.2861
+Children.Poverty    13.509640  379.0840
+Suicides            -4.963506  140.7179</code></pre>
+</div>
+</div>
+<p>Among the predictors retained from the LASSO model, only child poverty exhibits a statistically significant association with premature death based on 95% confidence intervals as the confidence interval lies above zero. The results highlight three dominant driver child poverty emerged as the strongest predictor in the model. This suggests that early-life socioeconomic disadvantage has profound and long-lasting impacts on population health and life expectancy. The exclusion of other predictorssuch as obesity, healthcare access, and environmental factors does not imply that they are unimportant. Rather, their effects are likely mediated through or correlated with the retained variables, particularly physical health burden and socioeconomic disadvantage.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>       fit      lwr      upr
+1 7691.385 4651.213 10731.56</code></pre>
+</div>
+</div>
+<p>For a county with average levels of poor physical health and suicide rates along with 13% of children living in poverty it is predicted to have approximately 7691.385 years of potential life list with a 95% prediction interval ranging from 4651.213 to 10731.56. When we compare this to the Multnomah county where they also share 13% percentage of children living in poverty and the premature death years is 7691.385 which is consistent with our model’s prediction.</p>
+<p>Among the three models, the theme of childhood poverty has come up consistently as the strongest predictor of health outcome. This important information should not be overlooked when it comes to ways we can pour into the communities to promote individual health. In our first model of predicting poor mental health , childhood poverty is retained despite other variables being eliminated. This suggests this variable captures a broader and consistent effects on mental health. In the model used to predict poor physical health days, childhood poverty is again retained along with broader set of variables. This indicates that physical health is influenced by a lot of factors yet childhood poverty still retain its importance rather than disappearing and merging with the rest. Finally, it is the only statistically significant predictor in the third model predicting premature death years after using LASSO and least-squares regression. The estimated effect includes for every 1% of children living in poverty and poor physical health and suicides controlled, the number of premature death years increase by 196.30. With all that said, these results demonstrate how important it is for lawmakers to look into ways to prevent and reduce the percentage of kids currently living in poverty. This can be explained as the long-term exposure to a lot of other health predictors such as lack of access to healthy food, limited access to gym and health care providers can have a huge negative impact on the general well-being of people which becomes a generational cycle.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
